@@ -1,0 +1,3 @@
+gcc -o dsp display.c init.c $(/usr/bin/python2.7-config --ldflags)
+gcc -o sort main.c init.c $(/usr/bin/python2.7-config --ldflags)
+gcc -o sort main.c display.c comms.c $(/usr/bin/python2.7-config --ldflags)
