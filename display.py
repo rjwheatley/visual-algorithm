@@ -45,7 +45,7 @@ class Display():
         
     def setDisplayDimensions(self, maxW, maxH):
         self.wdth = (maxW / 100) * 100
-        self.ht = (maxH / 100) * 100 - 100
+        self.ht = ((maxH / 100) * 100) - 100
         # the bottom y-coordinate of all the thin rectangles
         self.ry = self.ht - self.floor
         # the number of items to display
@@ -79,7 +79,7 @@ class Display():
         print "Display size (widthxheight) = %d x %d" % (w,h)
         self.updateScreen(self.data)
         # send display parameters
-        params = np.array([self.numItems,self.maxValue])
+        params = np.array([self.numItems,self.maxValue], dtype=np.int32)
         try:
             dispatcher.comms.conn.send(params.data)
         except socket.error:

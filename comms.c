@@ -102,10 +102,10 @@ int displayCaption(char *pName)
 int getParameters(int *pNumItems, int *pItemMax)
 {
     int n;
-    char data[2 * 4 * sizeof(int)];
+    char data[2 * sizeof(int)];
     while(1)
     {
-        n = recvfrom(sockfd, (void *)data, 2 * 4 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
+        n = recvfrom(sockfd, (void *)data, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
         if(n < 0)
         {
             perror("ERROR in recvFrom()");
