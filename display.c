@@ -3,7 +3,8 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
-#include <string.h> 
+#include <string.h>
+#include <strings.h>
 #include <sys/types.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
@@ -11,6 +12,10 @@
 #include <netdb.h> 
 #include <pthread.h>
 #include "comms.h"
+
+#ifndef h_addr
+#define h_addr h_addr_list[0] /* for backward compatibility */
+#endif
 
 #define PORT     15006
 #define SERVER_ADDR "127.0.0.1"
