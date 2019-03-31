@@ -23,8 +23,8 @@ void bogo(void)
 {
     while(1)
     {
-      int ndx;
-        for(ndx = 1 ; ndx < numItems ; ++ndx )
+	int ndx;
+	for(ndx = 1 ; ndx < numItems ; ++ndx )
         {
 	    if(data[ndx - 1] > data[ndx + 1])
 	    {
