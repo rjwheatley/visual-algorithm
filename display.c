@@ -1,3 +1,9 @@
+/**
+ * @brief code to launch a python thread which is a server receiving requests
+ *        over a TCP sockets and which displays data graphically using the
+ *        Pygame module.
+ *
+ */
 #include <stdio.h>
 #include <python2.7/Python.h>
 #include <stdio.h> 
@@ -56,7 +62,7 @@ static void *theThreadCode(void *argPtr)
  *                   top of the window
  * @param pCapStorage - a pointer to storage for the caption stting
  *
- * @return
+ * @return 0
  */ 
 int launchDisplay(char *pCaption, char *pCapStorage)
 {
@@ -111,6 +117,11 @@ int launchDisplay(char *pCaption, char *pCapStorage)
     return(0);
 }
 
+/**
+ * @brief Terminate the python display thread
+ *
+ * @return 0
+ */ 
 int joinThread(void)
 {
     if(pthread_join(theThread, NULL))

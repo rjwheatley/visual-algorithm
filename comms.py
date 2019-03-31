@@ -25,23 +25,18 @@ class comms():
         data = self.conn.recv(self.numItems * 4)
         if (len(data) / 4) == self.numItems:
             array = np.fromstring(data,dtype='>i4')
-            print "sending ack"
             # send acknowledgement
             status = 0
             ack = np.array([1,status], dtype=np.int32)
             self.conn.send(ack.data)
             return 1, array
         else:
-            print "self.numItems= %d" % self.numItems
-            print "data length= %d" % len(data)
             return 1, np.empty(0)
 
     def setCaption(self):
         str = ""
         data = self.conn.recv(100)
         str = data.decode('utf-8')
-        print str
-        print "sending ack"
         # send acknowledgement
         status = 0
         ack = np.array([2,status], dtype=np.int32)
@@ -54,14 +49,9 @@ class comms():
     def lookForIncoming(self,numItems):
         self.numItems = numItems
         try:
-            print "looking for incoming data"
             # data will be preceded by type
             msgTypeData = self.conn.recv(1 * 4)
             msgType = np.fromstring(msgTypeData,dtype='>i4')
-            print "received message of type %d" % msgType
-            print msgType
-            print msgType.shape
-            print msgType[0]
             mType, data = (self.handlers[msgType[0]])()
             return mType, data
         except socket.error:

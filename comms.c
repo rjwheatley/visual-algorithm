@@ -1,3 +1,7 @@
+/**
+ * @brief code that communicates, via TCP socket, with a python graphical display thread (see display.c)
+ *
+ */
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
@@ -21,6 +25,18 @@ static int sockfd;
 static struct sockaddr_in servaddr;
 static int serverlen;
 
+/**
+ * @brief waits for and connects to the python dsisplay server
+ *        via tcp as a client
+ *
+ * @param pCaption - pointer to a caption string to display at the
+ *                   top of the window
+ * @param pCapStorage - a pointer to storage for the caption stting
+ *
+ * @return
+ *   /li 0 - success
+ *   /li -1 - failure
+ */ 
 int connectToPythonDisplayServer(char *pCaption, char *pCapStorage)
 {
     struct hostent *server;
@@ -96,26 +112,23 @@ int update(int *pData, int numItems)
 	    printf("no data sent\n");
 	    break;
 	}
-	printf("waiting for ack\n");
         n = recvfrom(sockfd, (void *)data, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
         if(n < 0)
         {
             perror("ERROR in recvFrom()");
 	    break;
         }
-	printf("received data\n");
         if(n == 0)
         {
             printf("no data received\n");
 	    break;
         }
-	int type = (int)htonl(*(unsigned int *)&(data[0]));
+	int type = (int)*((unsigned int *)&(data[0]));
 	if( type != COMMS_DISPLAY_UPDATE )
 	{
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	printf("received ack\n");
 	int status = (int)htonl(*(unsigned int *)&(data[4]));
 	if( status != 0 )
 	{
@@ -126,6 +139,14 @@ int update(int *pData, int numItems)
     return(0);
 }
 
+/* @brief Send a comms display caption label message, with the caption string, to
+ *        to the pygame display server.  Wait for the acknowlegement.
+ *
+ * @param pName - pointer to the string to send
+ *
+ * @return
+ *    /li 0
+ */
 int displayCaption(char *pName)
 {
     int n;
@@ -149,30 +170,23 @@ int displayCaption(char *pName)
 	    printf("no data sent\n");
 	    break;
 	}
-	printf("waiting for ack\n");
         n = recvfrom(sockfd, (void *)rcvData, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
         if(n < 0)
         {
             perror("ERROR in recvFrom()");
 	    break;
         }
-	printf("received data\n");
         if(n == 0)
         {
             printf("no data received\n");
 	    break;
         }
-	for(int ndx= 0; ndx < 8 ; ++ndx)
-	{
-	    printf("%02x\n", rcvData[ndx] );
-	}
 	int type = (int)*((unsigned int *)&(rcvData[0]));
 	if( type != COMMS_DISPLAY_CAPTION )
 	{
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	printf("received ack\n");
 	int status = (int)ntohl(*((unsigned int *)&(rcvData[4])));
 	if( status != 0 )
 	{
@@ -216,14 +230,12 @@ int getParameters(int *pNumItems, int *pItemMax)
 	    printf("no data sent\n");
 	    break;
 	}
-	printf("waiting for ack\n");
         n = recvfrom(sockfd, (void *)data, 4 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
         if(n < 0)
         {
             perror("ERROR in recvFrom()");
 	    break;
         }
-	printf("received data\n");
         if(n == 0)
         {
             printf("no data received\n");
@@ -235,7 +247,6 @@ int getParameters(int *pNumItems, int *pItemMax)
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	printf("received ack\n");
 	int status = (int)htonl(*(unsigned int *)&(data[1]));
 	if( status != 0 )
 	{

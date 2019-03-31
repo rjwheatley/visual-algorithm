@@ -13,12 +13,6 @@ class UdpToPygame():
         
     def update(self,numItems):
         msgType, array = self.comms.lookForIncoming(numItems)
-        # first element of array should be the type; save and
-        # delete it before giving data to event handler
-#        msgType = array[0]
-        print "display.py update: msgType= %d" % msgType
-#        np.delete(array,[0])
-#        if len(array) > 0:
         ev = pygame.event.Event(pygame.USEREVENT, {'data': array, 'addr': self.comms.addr, 'msgType': msgType})
         pygame.event.post(ev)
         
@@ -68,31 +62,10 @@ class Display():
     def runIt(self,sys):
         print "Running"
         dispatcher = UdpToPygame()
-        print self.data
-        print self.data.shape[0]
-        """
-        baseName = os.path.basename(sys.argv[0])
-        # initialize the pygame module
-        try:
-            data = dispatcher.comms.conn.recv(100)
-            str = data.decode('utf-8')
-        except socket.error:
-            pass
-        print "caption: %s" % str
-        pygame.display.set_caption(str)
-        """
         # create a surface
         w, h = self.screen.get_size()
         print "Display size (widthxheight) = %d x %d" % (w,h)
         self.updateScreen(self.data)
-        """
-        # send display parameters
-        params = np.array([self.numItems,self.maxValue], dtype=np.int32)
-        try:
-            dispatcher.comms.conn.send(params.data)
-        except socket.error:
-            pass
-        """
         # define a variable to control the main loop
         running = True
         # main loop
@@ -104,21 +77,16 @@ class Display():
                     # change the value to False, to exit the main loop
                     running = False
                 if event.type == pygame.USEREVENT:
-#                    print "updating screen, msgType= %d" % event.msgType
                     if event.msgType == 1:
                         self.updateScreen(event.data)
                     elif event.msgType == 2:
-                        print "caption: %s" % event.data
                         pygame.display.set_caption(event.data)
                     elif event.msgType == 3:
                         try:
-                            print "sending ack"
                             # send acknowledgement
                             status = 0
                             ack = np.array([3,status,self.numItems,self.maxValue], dtype=np.int32)
-                            print ack
                             dispatcher.comms.conn.send(ack.data)
-#                            dispatcher.comms.conn.send(params.data)
                         except socket.error:
                             pass
             dispatcher.update(self.numItems)
