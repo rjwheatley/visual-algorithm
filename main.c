@@ -18,44 +18,15 @@
 #include <pthread.h>
 #include "display.h"
 #include "comms.h"
+#include "algSxn.h"
 
 static int dataWithRoomForType[ARRAY_SZ];
-static int *data= &(dataWithRoomForType[1]);
 static char caption[100];
+int *data= &(dataWithRoomForType[1]);
 int numItems;
 int itemMax;
 
-/**
- * @brief bogo sort algorithm
- *
- */ 
-void bogo(void)
-{
-    while(1)
-    {
-	int ndx;
-	for(ndx = 1 ; ndx < numItems ; ++ndx )
-        {
-	    if(data[ndx - 1] > data[ndx + 1])
-	    {
-	        break;
-	    }
-        }
-	if(ndx < numItems)
-	{
-	    for(int ndx = 0; ndx < numItems ; ++ndx)
-	    {
-	      data[ndx] = htonl(rand() % itemMax + 1);
-	    }
-	    update(data, numItems);
-	}
-	else
-	{
-	    break;
-	}
-    }
-    return;
-}
+extern struct sxnStruct __start_algsxn;
 
 void main()
 {
@@ -74,7 +45,8 @@ void main()
     printf("main() sending data\n");
     update(data, numItems);
     printf("main() starting bogo sort\n");
-    bogo();
+    struct sxnStruct *pStruct= &__start_algsxn;
+    pStruct->algFxn();
     joinThread();
     exit(0);
 }
