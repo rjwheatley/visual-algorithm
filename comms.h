@@ -1,3 +1,5 @@
+#pragma once
+
 #define ARRAY_SZ 2000
 
 extern int init(char *pCaption, char *pCapStorage);

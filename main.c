@@ -27,15 +27,23 @@ int *data= &(dataWithRoomForType[1]);
 int numItems;
 int itemMax;
 
-extern struct sxnStruct __start_algsxn;
-extern struct sxnStruct __stop_algsxn;
-
-void usage( void )
+static void usage( void )
 {
     printf( "usage:  sort -a <algorithm>\n" );
+    printf( "  algorithms:\n" );
+    struct sxnStruct *pStruct= &__start_algsxn;
+    while( pStruct != &__stop_algsxn )
+    {
+	if( pStruct->name != NULL )
+	{
+	    printf( "    %s\n", pStruct->name );
+	}
+	pStruct++;
+    }
+    exit(1);
 }
 
-void main(int argc, char *argv[])
+static struct sxnStruct *parseCmdLine( int argc, char *argv[] )
 {
     char *algorithm= NULL;
     int option= 0;
@@ -52,8 +60,28 @@ void main(int argc, char *argv[])
     if( algorithm == NULL )
     {
  	usage();
-	exit(1);
     }
+    struct sxnStruct *pStruct= &__start_algsxn;
+    while( pStruct != &__stop_algsxn )
+    {
+	if( !strcmp( pStruct->name, algorithm ) )
+	{
+	    printf( "found algoritm %s\n", algorithm );
+	    break;
+	}
+	pStruct++;
+    }
+    if( pStruct == &__stop_algsxn )
+    {
+	printf( "could not find algoritm %s, quitting\n", algorithm );
+	usage();
+    }
+    return pStruct;
+}
+
+void main(int argc, char *argv[])
+{
+    struct sxnStruct *pStruct= parseCmdLine( argc, argv );
     launchDisplay("bogo sort display",caption);
     displayCaption(caption);
     getParameters(&numItems, &itemMax);
@@ -64,20 +92,10 @@ void main(int argc, char *argv[])
     printf("main() creating initial data\n");
     for(int ndx = 0; ndx < numItems ; ++ndx)
     {
-      data[ndx] = htonl(rand() % itemMax + 1);
+	data[ndx] = htonl(rand() % itemMax + 1);
     }
-    printf("main() sending data\n");
-    update(data, numItems);
-    printf("main() starting bogo sort\n");
-    struct sxnStruct *pStruct= &__start_algsxn;
-    while( pStruct != &__stop_algsxn )
-    {
-	if( !strcmp( pStruct->name, algorithm ) )
-	{
-	    pStruct->algFxn();
-	}
-	pStruct++;
-    }
+    printf( "main() starting algorithm %s\n", pStruct->name );
+    pStruct->algFxn();
     joinThread();
     exit(0);
 }

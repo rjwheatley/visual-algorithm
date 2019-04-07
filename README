@@ -1,1 +1,1 @@
-gcc -std=c99 -D_GNU_SOURCE -o sort main.c display.c comms.c bogo.c -lc $(/usr/bin/python2.7-config --ldflags)
+gcc -std=c99 -D_GNU_SOURCE -o alg main.c display.c comms.c bogo.c -lc $(/usr/bin/python2.7-config --ldflags)
