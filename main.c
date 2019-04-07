@@ -16,6 +16,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <pthread.h>
+#include <ctype.h>
 #include "display.h"
 #include "comms.h"
 #include "algSxn.h"
@@ -27,9 +28,32 @@ int numItems;
 int itemMax;
 
 extern struct sxnStruct __start_algsxn;
+extern struct sxnStruct __stop_algsxn;
 
-void main()
+void usage( void )
 {
+    printf( "usage:  sort -a <algorithm>\n" );
+}
+
+void main(int argc, char *argv[])
+{
+    char *algorithm= NULL;
+    int option= 0;
+    while( (option = getopt( argc, argv, "a:" )) != -1 )
+    {
+	switch( option )
+	{
+        case 'a':
+
+            algorithm = optarg;
+            break;
+	}
+    }
+    if( algorithm == NULL )
+    {
+ 	usage();
+	exit(1);
+    }
     launchDisplay("bogo sort display",caption);
     displayCaption(caption);
     getParameters(&numItems, &itemMax);
@@ -46,7 +70,14 @@ void main()
     update(data, numItems);
     printf("main() starting bogo sort\n");
     struct sxnStruct *pStruct= &__start_algsxn;
-    pStruct->algFxn();
+    while( pStruct != &__stop_algsxn )
+    {
+	if( !strcmp( pStruct->name, algorithm ) )
+	{
+	    pStruct->algFxn();
+	}
+	pStruct++;
+    }
     joinThread();
     exit(0);
 }
