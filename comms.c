@@ -129,9 +129,14 @@ int update(int *pData, int numItems)
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	int status = (int)htonl(*(unsigned int *)&(data[4]));
+	int status = (int)*(unsigned int *)&(data[4]);
 	if( status != 0 )
 	{
+	    if( status == EXIT_STATUS )
+	    {
+		printf("Exit status, 0x%x, received, quitting\n", status );
+		exit(0);
+	    }
 	    printf("bad status, %d, received\n", status );
 	    break;
 	}

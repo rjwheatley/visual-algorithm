@@ -6,15 +6,6 @@ import pygame
 import numpy as np
 import socket
 from comms import comms
-
-class UdpToPygame():
-    def __init__(self):
-        self.comms = comms()
-        
-    def update(self,numItems):
-        msgType, array = self.comms.lookForIncoming(numItems)
-        ev = pygame.event.Event(pygame.USEREVENT, {'data': array, 'addr': self.comms.addr, 'msgType': msgType})
-        pygame.event.post(ev)
         
 class Display():
     def __init__(self):
@@ -37,6 +28,13 @@ class Display():
         self.setDisplayDimensions(infoObject.current_w, infoObject.current_h)
         self.screen = pygame.display.set_mode((self.wdth,self.ht))
         self.data = np.random.randint(self.maxValue, size=self.numItems)
+        self.comms = comms()
+        self.comms.setNumItems(self.numItems)
+        self.comms.setCallbacks({self.comms.UPDATE:self.updateScreen, \
+                                 self.comms.SET_CAPTION:self.setCaption, \
+                                 self.comms.RETURN_SCREEN_PARAMS:self.returnScreenParams})
+        self.running = True
+        self.exiting = False
         
     def setDisplayDimensions(self, maxW, maxH):
         self.wdth = (maxW / 100) * 100
@@ -47,49 +45,49 @@ class Display():
         self.numItems = self.wdth - (2 * self.margin)
         # the maximum value of an item
         self.maxValue = self.ht - self.ceiling
-        
+
+    # update screen callback - when the update message is handled in comms, the incoming
+    # data is handed to this callback and used to update the screen.
     def updateScreen(self,dispData):
         self.screen.fill((0,0,0))
         for ndx in range(0,dispData.shape[0]):
             rct = (self.margin + (ndx * self.thickness),self.ry,self.thickness,-dispData[ndx])
             pygame.draw.rect(self.screen, self.white, rct, self.thickness)
         pygame.display.update()
+        if self.exiting:
+            self.running = False
 
+    # set caption callback - when the set caption message is handled in comms, the incoming
+    # data is handed to this callback and used to update the screen caption
     def setCaption(self,str):
         print "caption: %s" % str
         pygame.display.set_caption(str)
 
+    # return screen parameters callback - when the return screen parameters message is handled
+    # in comms, this callback queues an acknowledgement containing the parameters.
+    def returnScreenParams(self,str):
+        # Queue data, the acknowledgement, to be sent to the client.
+        status = 0
+        ack = np.array([3,status,self.numItems,self.maxValue], dtype=np.int32)
+        self.comms.qDataForSending(ack.data)
+
     def runIt(self,sys):
         print "Running"
-        dispatcher = UdpToPygame()
         # create a surface
         w, h = self.screen.get_size()
         print "Display size (widthxheight) = %d x %d" % (w,h)
         self.updateScreen(self.data)
         # define a variable to control the main loop
-        running = True
         # main loop
-        while running:
+        while self.running:
             # event handling, gets all event from the event queue
             for event in pygame.event.get():
-                # only do something if the event is of type QUIT
                 if event.type == pygame.QUIT:
+                    print "display:  got quit event"
                     # change the value to False, to exit the main loop
-                    running = False
-                if event.type == pygame.USEREVENT:
-                    if event.msgType == 1:
-                        self.updateScreen(event.data)
-                    elif event.msgType == 2:
-                        pygame.display.set_caption(event.data)
-                    elif event.msgType == 3:
-                        try:
-                            # send acknowledgement
-                            status = 0
-                            ack = np.array([3,status,self.numItems,self.maxValue], dtype=np.int32)
-                            dispatcher.comms.conn.send(ack.data)
-                        except socket.error:
-                            pass
-            dispatcher.update(self.numItems)
+                    self.comms.setExitStatus()
+                    self.exiting = True
+            self.comms.processSockets()
         
 if __name__ == "__main__":
     dsp = Display()

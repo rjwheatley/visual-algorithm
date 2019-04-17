@@ -1,6 +1,6 @@
 /**
  * @brief code to launch a python thread which is a server receiving requests
- *        over a TCP sockets and which displays data graphically using the
+ *        over a TCP socket and which displays data graphically using the
  *        Pygame module.
  *
  */
