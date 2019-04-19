@@ -3,6 +3,7 @@
 struct sxnStruct
 {
     char *name;
+    char *displayStr;
     void (*algFxn)(void);
 };
 

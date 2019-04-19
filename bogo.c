@@ -56,4 +56,5 @@ static void bogo(void)
 }
 
 static char algName[]= "bogo";
-static struct sxnStruct sxnS __attribute((__section__("algsxn"))) = { algName, bogo };
+static char dispName[]= "bogo sort";
+static struct sxnStruct sxnS __attribute((__section__("algsxn"))) = { algName, dispName, bogo };

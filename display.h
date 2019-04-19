@@ -1,4 +1,4 @@
 #pragma once
 
-extern int launchDisplay(char *pCaption, char *pCapStorage);
+extern int launchDisplay(void);
 extern int joinThread(void);

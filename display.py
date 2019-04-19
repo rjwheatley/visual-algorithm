@@ -54,8 +54,6 @@ class Display():
             rct = (self.margin + (ndx * self.thickness),self.ry,self.thickness,-dispData[ndx])
             pygame.draw.rect(self.screen, self.white, rct, self.thickness)
         pygame.display.update()
-        if self.exiting:
-            self.running = False
 
     # set caption callback - when the set caption message is handled in comms, the incoming
     # data is handed to this callback and used to update the screen caption

@@ -30,6 +30,7 @@ class comms():
         self.UPDATE = 1
         self.SET_CAPTION = 2
         self.RETURN_SCREEN_PARAMS = 3
+        self.TE3RMINATE = 4
         self.handlers = { self.UPDATE:self.update, \
                           self.SET_CAPTION:self.setCaption, \
                           self.RETURN_SCREEN_PARAMS:False }

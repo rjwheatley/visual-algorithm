@@ -21,8 +21,10 @@
 #include "comms.h"
 #include "algSxn.h"
 
+#define CAPTION_MAX_SZ 100
+
 static int dataWithRoomForType[ARRAY_SZ];
-static char caption[100];
+static char caption[CAPTION_MAX_SZ];
 int *data= &(dataWithRoomForType[1]);
 int numItems;
 int itemMax;
@@ -82,7 +84,9 @@ static struct sxnStruct *parseCmdLine( int argc, char *argv[] )
 void main(int argc, char *argv[])
 {
     struct sxnStruct *pStruct= parseCmdLine( argc, argv );
-    launchDisplay("bogo sort display",caption);
+    launchDisplay();
+    memset(caption, 0, CAPTION_MAX_SZ);
+    snprintf(caption, CAPTION_MAX_SZ, "%s display", pStruct->displayStr);
     displayCaption(caption);
     getParameters(&numItems, &itemMax);
     numItems = ntohl(numItems);

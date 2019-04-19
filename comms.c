@@ -34,10 +34,10 @@ static int serverlen;
  * @param pCapStorage - a pointer to storage for the caption stting
  *
  * @return
- *   /li 0 - success
- *   /li -1 - failure
+ *    /li 0 - success
+ *    /li -1 - failure
  */ 
-int connectToPythonDisplayServer(char *pCaption, char *pCapStorage)
+int connectToPythonDisplayServer(void)
 {
     struct hostent *server;
     char *hostname= "127.0.0.1";
@@ -63,8 +63,6 @@ int connectToPythonDisplayServer(char *pCaption, char *pCapStorage)
     bcopy((char *)server->h_addr,
 	  (char *)&servaddr.sin_addr.s_addr, server->h_length);
     serverlen = sizeof(servaddr);
-    memset(pCapStorage, 0, 100);
-    strncpy(pCapStorage, pCaption, 100);
     /* wait for the server to be ready and connect */
     printf("waiting for server\n");
     int ret= 0;
@@ -134,7 +132,7 @@ int update(int *pData, int numItems)
 	{
 	    if( status == EXIT_STATUS )
 	    {
-		printf("Exit status, 0x%x, received, quitting\n", status );
+		printf("Exit status, 0x%x, received, exiting\n", status );
 		exit(0);
 	    }
 	    printf("bad status, %d, received\n", status );
