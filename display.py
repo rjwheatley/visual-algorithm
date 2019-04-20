@@ -32,9 +32,10 @@ class Display():
         self.comms.setNumItems(self.numItems)
         self.comms.setCallbacks({self.comms.UPDATE:self.updateScreen, \
                                  self.comms.SET_CAPTION:self.setCaption, \
-                                 self.comms.RETURN_SCREEN_PARAMS:self.returnScreenParams})
+                                 self.comms.RETURN_SCREEN_PARAMS:self.returnScreenParams, \
+                                 self.comms.TERMINATE:self.terminate})
         self.running = True
-        self.exiting = False
+#        self.exiting = False
         
     def setDisplayDimensions(self, maxW, maxH):
         self.wdth = (maxW / 100) * 100
@@ -61,6 +62,11 @@ class Display():
         print "caption: %s" % str
         pygame.display.set_caption(str)
 
+    # terminate callback - after the terminate message is handled in comms, this
+    # callback sets self.running to false
+    def terminate(self,nullData):
+        self.running = False
+
     # return screen parameters callback - when the return screen parameters message is handled
     # in comms, this callback queues an acknowledgement containing the parameters.
     def returnScreenParams(self,str):
@@ -84,7 +90,7 @@ class Display():
                     print "display:  got quit event"
                     # change the value to False, to exit the main loop
                     self.comms.setExitStatus()
-                    self.exiting = True
+#                    self.exiting = True
             self.comms.processSockets()
         
 if __name__ == "__main__":

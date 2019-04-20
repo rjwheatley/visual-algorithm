@@ -37,7 +37,7 @@ static int serverlen;
  * @return
  *    /li 0 - success
  *    /li -1 - failure
- */ 
+ */
 int connectToPythonDisplayServer(void)
 {
     struct hostent *server;
@@ -260,6 +260,37 @@ int getParameters(int *pNumItems, int *pItemMax)
 	}
 	*pNumItems = (int)htonl(*(unsigned int *)&(data[2]));
 	*pItemMax = (int)htonl(*(unsigned int *)&(data[3]));
+    } while( 0 );
+    return(0);
+}
+
+/* @brief Send a comms terminate message to the pygame display
+ *        server.
+ *
+ * @return
+ *    /li 0
+ */
+int terminateServer(void)
+{
+    int n;
+    int data[1];
+    data[0] = (int)htonl(COMMS_TERMINATE);
+    /* Leverage the break feature of do-while() to reduce
+     * complexity of if-else and indentation
+     */
+    do
+    {
+	n = send(sockfd, data, sizeof(int), 0 );
+	if(n < 0)
+	{
+	    printf("send failed - assuming python process aborted; ending\n");
+	    exit(0);
+	}
+	if(n == 0)
+	{
+	    printf("no data sent\n");
+	    break;
+	}
     } while( 0 );
     return(0);
 }

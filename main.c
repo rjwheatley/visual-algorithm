@@ -1,7 +1,9 @@
 /**
- * @brief main() for C-code test-bed for algorithms; includes bogo-sort as example algorithm; displays
- *        data visually as the algorithm proceeds by sending it to a separate thread via TCP messages;
- *        server thread is coded in python and uses the Pygame module.
+ * @brief invokes a test-bed for algorithms; parses the command line; launches a python display
+ *        server in a separate thread; searches the data section, algsxn, for the command-line
+ *        specified algorithm; sends a message to the server to set the display server caption;
+ *        sends a message to the display server requesting parameters; starts the algorithm;
+ *        exits;
  *
  */
 #include <stdio.h>
@@ -16,7 +18,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <pthread.h>
-#include <ctype.h>
+#include <ctype.h> 
 #include "display.h"
 #include "comms.h"
 #include "algSxn.h"
@@ -29,6 +31,10 @@ int *data= &(dataWithRoomForType[1]);
 int numItems;
 int itemMax;
 
+/**
+ * @brief prints program usage
+ *
+ */
 static void usage( void )
 {
     printf( "usage:  sort -a <algorithm>\n" );
@@ -45,6 +51,34 @@ static void usage( void )
     exit(1);
 }
 
+/**
+ * @brief requests/processes user input
+ *
+ */
+static int menu( void )
+{
+    printf( "menu:\n" );
+    printf( "  1 - run again\n" );
+    printf( "  any other key - quit\n" );
+    char inStr[20];
+    fgets( inStr, 20, stdin );
+    int retVal= 0;
+    if( !strcmp(inStr,"1\n") )
+    {
+	retVal = 1;
+    }
+    return retVal;
+}
+
+/**
+ * @brief command line parser
+ *
+ * @param argc - number of command line arguments including the program name
+ * @param argv[] - array of command line argument strings
+ *
+ * @return
+ *    /li pointer to sxnStruct structure
+ */
 static struct sxnStruct *parseCmdLine( int argc, char *argv[] )
 {
     char *algorithm= NULL;
@@ -81,6 +115,17 @@ static struct sxnStruct *parseCmdLine( int argc, char *argv[] )
     return pStruct;
 }
 
+/**
+ * @brief invokes a test-bed for algorithms; parses the command line; launches a python display
+ *        server in a separate thread; searches the data section, algsxn, for the command-line
+ *        specified algorithm; sends a message to the server to set the display server caption;
+ *        sends a message to the display server requesting parameters; starts the algorithm;
+ *        exits;
+ *
+ * @param argc - number of command line arguments including the program name
+ * @param argv[] - array of command line argument strings
+ *
+ */ 
 void main(int argc, char *argv[])
 {
     struct sxnStruct *pStruct= parseCmdLine( argc, argv );
@@ -95,6 +140,16 @@ void main(int argc, char *argv[])
 	   numItems, itemMax);
     printf( "main() starting algorithm %s\n", pStruct->name );
     pStruct->algFxn();
+    while(1)
+    {
+	if(menu())
+	{
+	    pStruct->algFxn();
+	    continue;
+	}
+	break;
+    }
+    terminateServer();
     joinThread();
     exit(0);
 }
