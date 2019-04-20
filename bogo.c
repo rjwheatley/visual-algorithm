@@ -29,8 +29,15 @@ extern int *data;
  */ 
 static void bogo(void)
 {
+    /* initial data */
+    for(int ndx = 0; ndx < numItems ; ++ndx)
+    {
+	data[ndx] = htonl(rand() % itemMax + 1);
+    }
+    update(data, numItems);
     while(1)
     {
+        /* check if data is sorted */
 	int ndx;
 	for(ndx = 1 ; ndx < numItems ; ++ndx )
         {

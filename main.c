@@ -93,11 +93,6 @@ void main(int argc, char *argv[])
     itemMax = ntohl(itemMax);
     printf("main(): getParameters() returned numItems= %d, itemMax= %d\n",
 	   numItems, itemMax);
-    printf("main() creating initial data\n");
-    for(int ndx = 0; ndx < numItems ; ++ndx)
-    {
-	data[ndx] = htonl(rand() % itemMax + 1);
-    }
     printf( "main() starting algorithm %s\n", pStruct->name );
     pStruct->algFxn();
     joinThread();

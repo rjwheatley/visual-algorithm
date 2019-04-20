@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include "comms.h"
+#include "display.h"
 
 #ifndef h_addr
 #define h_addr h_addr_list[0] /* for backward compatibility */
@@ -132,7 +133,8 @@ int update(int *pData, int numItems)
 	{
 	    if( status == EXIT_STATUS )
 	    {
-		printf("Exit status, 0x%x, received, exiting\n", status );
+		printf("\nupdate:  Exit status, 0x%x, received, exiting\n", status );
+		joinThread();
 		exit(0);
 	    }
 	    printf("bad status, %d, received\n", status );

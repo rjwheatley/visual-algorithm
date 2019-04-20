@@ -1,1 +1,24 @@
-gcc -std=c99 -D_GNU_SOURCE -o alg main.c display.c comms.c bogo.c -lc $(/usr/bin/python2.7-config --ldflags)
+Learn coding. Teach coding in a Linux environment.
+
+When he was 7 years old, my son became fascinated with sorting algorithms.
+He learned the details of algorithms like bubble sort, quick sort, merge
+sort, heap sort, etc. which he could demonstrate using a collection of
+multi-height lego columns.  I saw an opportunity to teach him to code in C.
+This project supplies a means to visualize sorting algorithms as they sort.
+It is inspired by many youtube videos.  The algorithms themselves are
+isolated in their own files.  The goal is for the new coder to create a
+collection of files, each file implementing a different sorting algorithm.
+The project contains an example, bogo sort.
+
+The project has 3 components:
+  1 - server; provides display; coded in Python; communication via TCP socket
+  2 - client; provides user interface; coded in C; 
+      communicates with server via TCP socket (request/acknowledgement)
+  3 - algorithms; one per file; statically linked with executable; have their
+      own section; bogo.c example/template
+
+Copy bogo.c to (e.g.) bubble.c
+Code bubble sort.
+Call update() whenever a screen update is desired.
+Type make to build new executable.
+Example invocation:  ./algo -a bogo

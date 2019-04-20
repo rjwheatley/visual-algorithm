@@ -137,6 +137,9 @@ class comms():
                 self.out_socks.remove(skt)
             else:
                 skt.send(msgToSend)
+                if self.status is self.EXIT_STATUS:
+                    print "comms.py:  Exiting"
+                    exit(0)
         # Handle exceptions
         for skt in exceptional:
             print("Python display server:  socket %s got exception" % skt.getpeername())
