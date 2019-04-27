@@ -5,10 +5,17 @@ He learned the details of algorithms like bubble sort, quick sort, merge
 sort, heap sort, etc. which he could demonstrate using a collection of
 multi-height lego columns.  I saw an opportunity to teach him to code in C.
 This project supplies a means to visualize sorting algorithms as they sort.
-It is inspired by many youtube videos.  The algorithms themselves are
-isolated in their own files.  The goal is for the new coder to create a
-collection of files, each file implementing a different sorting algorithm.
-The project contains an example, bogo sort.
+It is inspired by many youtube videos.
+
+youtube:
+
+https://youtu.be/yIQuKSwPlro  Simple sxplanation of bubble sort
+https://youtu.be/MtcrEhrt_K0  Legos bubble sort
+https://youtu.be/Cq7SMsQBEUw  Bubble sort visualization
+
+The algorithms themselves are isolated in their own files.  The goal is for
+the new coder to create a collection of files, each file implementing a
+different sorting algorithm.  The project contains an example, bogo sort.
 
 The project has 3 components:
   1 - server; provides display; coded in Python; communication via TCP socket
