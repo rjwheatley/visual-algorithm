@@ -11,7 +11,7 @@
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h>
-#include <netdb.h> 
+#include <netdb.h>
 #include "comms.h"
 #include "display.h"
 
@@ -80,6 +80,48 @@ int connectToPythonDisplayServer(void)
     return(0);
 }
 
+/* @brief perform a check on the return value of send()
+ *        or recvfrom()
+ *
+ * @param status - what was returned by send() or recvFrom()
+ * @param snd - check send() status if COMMS_STAT_CHK_SND,
+ *        recvFrom() status otherwise
+ *
+ * @return
+ *    /li 0 - on success
+ *    /li -1 - on failure
+ */
+static int checkSndOrRcvStatus(int status, T_COMMS_STAT_CHK_E statChkType )
+{
+    int retVal = 0;
+    /* Leverage the break feature of do-while() to reduce
+     * complexity of if-else and indentation
+     */
+    do
+    {
+	if(status < 0)
+	{
+	    if( statChkType == COMMS_STAT_CHK_SND )
+	    {
+		printf("send failed - assuming python process aborted; ending\n");
+		exit(0);
+	    }
+	    else
+	    {
+		perror("ERROR in recvFrom()");
+		retVal = -1;
+		break;
+	    }
+	}
+	if(status == 0)
+	{
+	    printf("no data %s\n", (statChkType == COMMS_STAT_CHK_SND) ? "sent" : "received");
+	    retVal = -1;
+	}
+    } while( 0 );
+    return( retVal );
+}
+
 /* @brief Send a comms display update message, with the update data, to
  *        to the pygame display server.  Wait for the acknowlegement.
  *
@@ -101,34 +143,24 @@ int update(int *pData, int numItems)
     do
     {
 	n = send(sockfd, pData, (numItems + 1) * sizeof(int), 0 );
-	if(n < 0)
+	int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
+	if( status )
 	{
-	    printf("send failed - assuming python process aborted; ending\n");
-	    exit(0);
-	}
-	if(n == 0)
-	{
-	    printf("no data sent\n");
 	    break;
 	}
         n = recvfrom(sockfd, (void *)data, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
-        if(n < 0)
-        {
-            perror("ERROR in recvFrom()");
+	status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
+	if( status )
+	{
 	    break;
-        }
-        if(n == 0)
-        {
-            printf("no data received\n");
-	    break;
-        }
+	}
 	int type = (int)*((unsigned int *)&(data[0]));
 	if( type != COMMS_DISPLAY_UPDATE )
 	{
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	int status = (int)*(unsigned int *)&(data[4]);
+	status = (int)*(unsigned int *)&(data[4]);
 	if( status != 0 )
 	{
 	    if( status == EXIT_STATUS )
@@ -165,34 +197,24 @@ int displayCaption(char *pName)
     do
     {
 	n = send(sockfd, sndData, 4 + strlen(pName), 0 );
-	if(n < 0)
+	int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
+	if( status )
 	{
-	    printf("send failed - assuming python process aborted; ending\n");
-	    exit(0);
-	}
-	if(n == 0)
-	{
-	    printf("no data sent\n");
 	    break;
 	}
         n = recvfrom(sockfd, (void *)rcvData, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
-        if(n < 0)
-        {
-            perror("ERROR in recvFrom()");
+	status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
+	if( status )
+	{
 	    break;
-        }
-        if(n == 0)
-        {
-            printf("no data received\n");
-	    break;
-        }
+	}
 	int type = (int)*((unsigned int *)&(rcvData[0]));
 	if( type != COMMS_DISPLAY_CAPTION )
 	{
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	int status = (int)ntohl(*((unsigned int *)&(rcvData[4])));
+	status = (int)ntohl(*((unsigned int *)&(rcvData[4])));
 	if( status != 0 )
 	{
 	    printf("bad status, %d, received\n", status );
@@ -225,34 +247,24 @@ int getParameters(int *pNumItems, int *pItemMax)
     do
     {
 	n = send(sockfd, data, sizeof(int), 0 );
-	if(n < 0)
+	int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
+	if( status )
 	{
-	    printf("send failed - assuming python process aborted; ending\n");
-	    exit(0);
-	}
-	if(n == 0)
-	{
-	    printf("no data sent\n");
 	    break;
 	}
         n = recvfrom(sockfd, (void *)data, 4 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
-        if(n < 0)
-        {
-            perror("ERROR in recvFrom()");
+	status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
+	if( status )
+	{
 	    break;
-        }
-        if(n == 0)
-        {
-            printf("no data received\n");
-	    break;
-        }
+	}
 	int type = (int)*(unsigned int *)&(data[0]);
 	if( type != COMMS_DISPLAY_GET_PARAMS )
 	{
 	    printf("wrong type, %d, received\n", type );
 	    break;
 	}
-	int status = (int)htonl(*(unsigned int *)&(data[1]));
+	status = (int)htonl(*(unsigned int *)&(data[1]));
 	if( status != 0 )
 	{
 	    printf("bad status, %d, received\n", status );
@@ -275,22 +287,7 @@ int terminateServer(void)
     int n;
     int data[1];
     data[0] = (int)htonl(COMMS_TERMINATE);
-    /* Leverage the break feature of do-while() to reduce
-     * complexity of if-else and indentation
-     */
-    do
-    {
-	n = send(sockfd, data, sizeof(int), 0 );
-	if(n < 0)
-	{
-	    printf("send failed - assuming python process aborted; ending\n");
-	    exit(0);
-	}
-	if(n == 0)
-	{
-	    printf("no data sent\n");
-	    break;
-	}
-    } while( 0 );
+    n = send(sockfd, data, sizeof(int), 0 );
+    checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
     return(0);
 }
