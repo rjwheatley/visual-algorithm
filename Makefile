@@ -3,7 +3,7 @@ src = $(wildcard *.c) \
 obj = $(src:.c=.o)
 dep = $(obj:.o=.d)  # one dependency file for each source
 
-LDFLAGS = -lc -lpython2.7
+LDFLAGS = -lc -lpython2.7 -lpthread
 INCLUDES = -I/usr/include/python2.7 -I/usr/include/python2.7 -I.
 CFLAGS = -std=c99 -D_GNU_SOURCE $(INCLUDES) $(/usr/bin/python2.7-config --ldflags)
 
