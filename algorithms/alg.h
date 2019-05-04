@@ -20,7 +20,3 @@
 #include "display.h"
 #include "comms.h"
 #include "algSxn.h"
-
-extern int numItems;
-extern int itemMax;
-extern int *data;

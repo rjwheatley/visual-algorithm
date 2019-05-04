@@ -122,6 +122,21 @@ static int checkSndOrRcvStatus(int status, T_COMMS_STAT_CHK_E statChkType )
     return( retVal );
 }
 
+/* @brief Convert the integers in the specified array to a network
+ *        format
+ *
+ * @param pData - pointer to the data to convert
+ * @param numItems - amount of data
+ *
+ */
+static void convertForNetwork(int *pData, int numItems)
+{
+    for( int ndx = 0 ; ndx < numItems ; ++ndx )
+    {
+	pData[ndx] =  htonl(pData[ndx]);
+    }
+}
+
 /* @brief Send a comms display update message, with the update data, to
  *        to the pygame display server.  Wait for the acknowlegement.
  *
@@ -136,7 +151,8 @@ int update(int *pData, int numItems)
     int n;
     char data[2 * sizeof(int)];
     --pData;
-    *pData = (int)htonl(COMMS_DISPLAY_UPDATE);
+    *pData = (int)COMMS_DISPLAY_UPDATE;
+    convertForNetwork( pData, numItems + 1 );
     /* Leverage the break feature of do-while() to reduce
      * complexity of if-else and indentation
      */

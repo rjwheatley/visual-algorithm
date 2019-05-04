@@ -36,6 +36,14 @@ class comms():
                           self.RETURN_SCREEN_PARAMS:False, \
                           self.TERMINATE:False }
         self.status = 0
+    # Determine the endianness of the incoming data.
+    def dataInIsBE(self):
+        wd = 0x0055
+        swd = socket.ntohs(wd)
+        if wd != swd:
+            return True
+        else:
+            return False
 
     # update handler - receives data from the client, queues an acknowledgement,
     #                  packages data in array, and returns it; if the amount
@@ -44,7 +52,10 @@ class comms():
     def update(self):
         data = self.conn.recv(self.numItems * 4)
         if (len(data) / 4) == self.numItems:
-            array = np.fromstring(data,dtype='>i4')
+            if self.dataInIsBE():
+                array = np.fromstring(data,dtype='>i4')
+            else:
+                array = np.fromstring(data,dtype='<i4')
             # send acknowledgement
             ack = np.array([self.UPDATE,self.status], dtype=np.int32)
             self.qDataForSending(ack.data)
