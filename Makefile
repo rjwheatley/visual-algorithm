@@ -4,7 +4,7 @@ obj = $(src:.c=.o)
 dep = $(obj:.o=.d)  # one dependency file for each source
 
 LDFLAGS = -lc -lpython2.7 -lpthread
-INCLUDES = -I/usr/include/python2.7 -I/usr/include/python2.7 -I.
+INCLUDES = -I/usr/include/python2.7 -I/usr/include/python2.7 -I. -I./algorithms
 CFLAGS = -std=c99 -D_GNU_SOURCE $(INCLUDES) $(/usr/bin/python2.7-config --ldflags)
 
 alg: $(obj)
