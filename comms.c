@@ -137,6 +137,21 @@ static void convertForNetwork(int *pData, int numItems)
     }
 }
 
+/* @brief Convert the integers in the specified array from a network
+ *        format
+ *
+ * @param pData - pointer to the data to convert
+ * @param numItems - amount of data
+ *
+ */
+static void convertFromNetwork(int *pData, int numItems)
+{
+    for( int ndx = 0 ; ndx < numItems ; ++ndx )
+    {
+	pData[ndx] =  ntohl(pData[ndx]);
+    }
+}
+
 /* @brief Send a comms display update message, with the update data, to
  *        to the pygame display server.  Wait for the acknowlegement.
  *
@@ -189,6 +204,7 @@ int update(int *pData, int numItems)
 	    break;
 	}
     } while( 0 );
+    convertFromNetwork( pData, numItems + 1 );
     return(0);
 }
 

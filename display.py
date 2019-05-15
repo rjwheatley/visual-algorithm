@@ -10,8 +10,11 @@ from comms import comms
 class Display():
     def __init__(self):
         print "Display instantiated"
+        # SDL default sound driver is ALSA but the Python program can select something else.
+        # Change it to avoid:  ALSA lib pcm.c:8306:(snd_pcm_recover) underrun occurred
+        os.environ['SDL_AUDIODRIVER'] = 'dsp'
         # thin rectangle dimensions
-        self.thickness = 1
+        self.thickness = 5
         # the color of all the thin rectangles
         self.white = (255,255,255)
         # how much margin to leave on left and right
@@ -35,7 +38,6 @@ class Display():
                                  self.comms.RETURN_SCREEN_PARAMS:self.returnScreenParams, \
                                  self.comms.TERMINATE:self.terminate})
         self.running = True
-#        self.exiting = False
         
     def setDisplayDimensions(self, maxW, maxH):
         self.wdth = (maxW / 100) * 100
@@ -43,7 +45,7 @@ class Display():
         # the bottom y-coordinate of all the thin rectangles
         self.ry = self.ht - self.floor
         # the number of items to display
-        self.numItems = self.wdth - (2 * self.margin)
+        self.numItems = (self.wdth - (2 * self.margin)) / self.thickness
         # the maximum value of an item
         self.maxValue = self.ht - self.ceiling
 
@@ -53,7 +55,7 @@ class Display():
         self.screen.fill((0,0,0))
         for ndx in range(0,dispData.shape[0]):
             rct = (self.margin + (ndx * self.thickness),self.ry,self.thickness,-dispData[ndx])
-            pygame.draw.rect(self.screen, self.white, rct, self.thickness)
+            pygame.draw.rect(self.screen, self.white, rct)
         pygame.display.update()
 
     # set caption callback - when the set caption message is handled in comms, the incoming
@@ -82,6 +84,7 @@ class Display():
         print "Display size (widthxheight) = %d x %d" % (w,h)
         self.updateScreen(self.data)
         # define a variable to control the main loop
+        clock = pygame.time.Clock()
         # main loop
         while self.running:
             # event handling, gets all event from the event queue
@@ -90,17 +93,10 @@ class Display():
                     print "display:  got quit event"
                     # change the value to False, to exit the main loop
                     self.comms.setExitStatus()
-#                    self.exiting = True
             self.comms.processSockets()
+            clock.tick(40)
+            pygame.display.flip()
         
 if __name__ == "__main__":
     dsp = Display()
     dsp.runIt(sys)
-
-
-    """
-        pygame.display.flip()
-                t = pygame.font.SysFont('', 40).render(ev.data, True, (255,255,255))
-                screen.blit(t, (0, l*20))
-                l += 1
-    """

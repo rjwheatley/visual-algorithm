@@ -59,14 +59,28 @@ static int menu( void )
 {
     printf( "menu:\n" );
     printf( "  1 - run again\n" );
+    printf( "  2 - refresh\n" );
     printf( "  any other key - quit\n" );
     char inStr[20];
     fgets( inStr, 20, stdin );
     int retVal= 0;
-    if( !strcmp(inStr,"1\n") )
+    /* Leverage the break feature of do-while() to reduce
+     * complexity of if-else and indentation
+     */
+    do
     {
-	retVal = 1;
-    }
+	if( !strcmp(inStr,"1\n") )
+	{
+	    retVal = 1;
+	    break;
+	}
+	if( !strcmp(inStr,"2\n") )
+	{
+	    retVal = 2;
+	    update(data, numItems);
+	    break;
+	}
+    } while( 0 );
     return retVal;
 }
 
@@ -142,9 +156,14 @@ void main(int argc, char *argv[])
     pStruct->algFxn();
     while(1)
     {
-	if(menu())
+	int retVal= menu();
+	if(retVal == 1)
 	{
 	    pStruct->algFxn();
+	    continue;
+	}
+	if(retVal == 2)
+	{
 	    continue;
 	}
 	break;
