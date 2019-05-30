@@ -7,6 +7,15 @@ multi-height lego columns.  I saw an opportunity to teach him to code in C.
 This project supplies a means to visualize sorting algorithms as they sort.
 It is inspired by many youtube videos.
 
+Perform the following installs:
+
+sudo apt install make
+sudo apt install gcc
+sudo apt install python-dev
+sudo apt install python-pip
+pip install pygame
+pip install numpy
+
 youtube:
 
 https://youtu.be/yIQuKSwPlro  Simple sxplanation of bubble sort
