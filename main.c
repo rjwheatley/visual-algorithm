@@ -37,7 +37,7 @@ int itemMax;
  */
 static void usage( void )
 {
-    printf( "usage:  sort -a <algorithm>\n" );
+    printf( "usage:  ./alg -a <algorithm>\n" );
     printf( "  algorithms:\n" );
     struct sxnStruct *pStruct= &__start_algsxn;
     while( pStruct != &__stop_algsxn )
