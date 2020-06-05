@@ -36,7 +36,7 @@ static void mrg(int ndx, int n, int loNdx, int hiNdx)
 {
 	int temp;
 //	int wrNdx= ndx + (loNdx - ndx) + (hiNdx - (ndx + n / 2));
-d	int wrNdx= loNdx + hiNdx - (ndx + n / 2);
+	int wrNdx= loNdx + hiNdx - (ndx + n / 2);
 
 	if(loNdx >= ndx + (n / 2))
 	{
@@ -55,7 +55,7 @@ d	int wrNdx= loNdx + hiNdx - (ndx + n / 2);
 		mrg(ndx, n, loNdx, hiNdx);
 	}
 	data[wrNdx] = temp;
-6	update(data, numItems);
+	update(data, numItems);
 }
 
 /**
