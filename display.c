@@ -69,8 +69,8 @@ int launchDisplay(void)
     printf("starting python thread\n");
     if(pthread_create(&theThread, NULL, theThreadCode, NULL))
     {
-	  fprintf(stderr, "Error creating thread\n");
-	  return(-1);
+        fprintf(stderr, "Error creating thread\n");
+        return(-1);
     }
     printf("done starting python thread\n");
     connectToPythonDisplayServer();
@@ -88,14 +88,14 @@ int launchDisplay(void)
     if(server == NULL)
     {
         fprintf(stderr,"ERROR, no such host as %s\n", hostname);
-	return(-1);
+        return(-1);
     }
     memset(&servaddr, 0, sizeof(servaddr));
     // Filling server information 
     servaddr.sin_family = AF_INET; 
     servaddr.sin_port = htons(port);
     bcopy((char *)server->h_addr,
-	  (char *)&servaddr.sin_addr.s_addr, server->h_length);
+          (char *)&servaddr.sin_addr.s_addr, server->h_length);
     serverlen = sizeof(servaddr);
     /* wait for the server to be ready and connect */
     printf("waiting for server\n");
@@ -103,11 +103,11 @@ int launchDisplay(void)
     while(1)
     {
         ret = connect(sockfd, (struct sockaddr *)&servaddr, serverlen);
-	if(ret < 0)
-	{
-	    continue;
-	}
-	break;
+        if(ret < 0)
+        {
+            continue;
+        }
+        break;
     }
     return(0);
 }
@@ -123,7 +123,7 @@ int joinThread(void)
     if(pthread_join(theThread, NULL))
     {
         fprintf(stderr, "Error joining thread\n");
-	return(-1);
+        return(-1);
     }
     return(0);
 }

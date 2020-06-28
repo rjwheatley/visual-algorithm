@@ -48,21 +48,21 @@ int connectToPythonDisplayServer(void)
     if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 )
     { 
         perror("socket creation failed");
-	return(-1);
+        return(-1);
     }
     /* gethostbyname: get the server's DNS entry */
     server = gethostbyname(hostname);
     if(server == NULL)
     {
         fprintf(stderr,"ERROR, no such host as %s\n", hostname);
-	return(-1);
+        return(-1);
     }
     memset(&servaddr, 0, sizeof(servaddr));
     // Filling server information 
     servaddr.sin_family = AF_INET; 
     servaddr.sin_port = htons(port);
     bcopy((char *)server->h_addr,
-	  (char *)&servaddr.sin_addr.s_addr, server->h_length);
+          (char *)&servaddr.sin_addr.s_addr, server->h_length);
     serverlen = sizeof(servaddr);
     /* wait for the server to be ready and connect */
     printf("waiting for server\n");
@@ -70,11 +70,11 @@ int connectToPythonDisplayServer(void)
     while(1)
     {
         ret = connect(sockfd, (struct sockaddr *)&servaddr, serverlen);
-	if(ret < 0)
-	{
-	    continue;
-	}
-	break;
+        if(ret < 0)
+        {
+            continue;
+        }
+        break;
     }
     printf("connected to server\n");
     return(0);
@@ -99,25 +99,25 @@ static int checkSndOrRcvStatus(int status, T_COMMS_STAT_CHK_E statChkType )
      */
     do
     {
-	if(status < 0)
-	{
-	    if( statChkType == COMMS_STAT_CHK_SND )
-	    {
-		printf("send failed - assuming python process aborted; ending\n");
-		exit(0);
-	    }
-	    else
-	    {
-		perror("ERROR in recvFrom()");
-		retVal = -1;
-		break;
-	    }
-	}
-	if(status == 0)
-	{
-	    printf("no data %s\n", (statChkType == COMMS_STAT_CHK_SND) ? "sent" : "received");
-	    retVal = -1;
-	}
+        if(status < 0)
+        {
+            if( statChkType == COMMS_STAT_CHK_SND )
+            {
+                printf("send failed - assuming python process aborted; ending\n");
+                exit(0);
+            }
+            else
+            {
+                perror("ERROR in recvFrom()");
+                retVal = -1;
+                break;
+            }
+        }
+        if(status == 0)
+        {
+            printf("no data %s\n", (statChkType == COMMS_STAT_CHK_SND) ? "sent" : "received");
+            retVal = -1;
+        }
     } while( 0 );
     return( retVal );
 }
@@ -133,7 +133,7 @@ static void convertForNetwork(int *pData, int numItems)
 {
     for( int ndx = 0 ; ndx < numItems ; ++ndx )
     {
-	pData[ndx] =  htonl(pData[ndx]);
+        pData[ndx] =  htonl(pData[ndx]);
     }
 }
 
@@ -148,7 +148,7 @@ static void convertFromNetwork(int *pData, int numItems)
 {
     for( int ndx = 0 ; ndx < numItems ; ++ndx )
     {
-	pData[ndx] =  ntohl(pData[ndx]);
+        pData[ndx] =  ntohl(pData[ndx]);
     }
 }
 
@@ -173,36 +173,36 @@ int update(int *pData, int numItems)
      */
     do
     {
-	n = send(sockfd, pData, (numItems + 1) * sizeof(int), 0 );
-	int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
-	if( status )
-	{
-	    break;
-	}
+        n = send(sockfd, pData, (numItems + 1) * sizeof(int), 0 );
+        int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
+        if( status )
+        {
+            break;
+        }
         n = recvfrom(sockfd, (void *)data, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
-	status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
-	if( status )
-	{
-	    break;
-	}
-	int type = (int)*((unsigned int *)&(data[0]));
-	if( type != COMMS_DISPLAY_UPDATE )
-	{
-	    printf("wrong type, %d, received\n", type );
-	    break;
-	}
-	status = (int)*(unsigned int *)&(data[4]);
-	if( status != 0 )
-	{
-	    if( status == EXIT_STATUS )
-	    {
-		printf("\nupdate:  Exit status, 0x%x, received, exiting\n", status );
-		joinThread();
-		exit(0);
-	    }
-	    printf("bad status, %d, received\n", status );
-	    break;
-	}
+        status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
+        if( status )
+        {
+            break;
+        }
+        int type = (int)*((unsigned int *)&(data[0]));
+        if( type != COMMS_DISPLAY_UPDATE )
+        {
+            printf("wrong type, %d, received\n", type );
+            break;
+        }
+        status = (int)*(unsigned int *)&(data[4]);
+        if( status != 0 )
+        {
+            if( status == EXIT_STATUS )
+            {
+                printf("\nupdate:  Exit status, 0x%x, received, exiting\n", status );
+                joinThread();
+                exit(0);
+            }
+            printf("bad status, %d, received\n", status );
+            break;
+        }
     } while( 0 );
     convertFromNetwork( pData, numItems + 1 );
     return(0);
@@ -228,30 +228,30 @@ int displayCaption(char *pName)
      */
     do
     {
-	n = send(sockfd, sndData, 4 + strlen(pName), 0 );
-	int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
-	if( status )
-	{
-	    break;
-	}
+        n = send(sockfd, sndData, 4 + strlen(pName), 0 );
+        int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
+        if( status )
+        {
+            break;
+        }
         n = recvfrom(sockfd, (void *)rcvData, 2 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
-	status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
-	if( status )
-	{
-	    break;
-	}
-	int type = (int)*((unsigned int *)&(rcvData[0]));
-	if( type != COMMS_DISPLAY_CAPTION )
-	{
-	    printf("wrong type, %d, received\n", type );
-	    break;
-	}
-	status = (int)ntohl(*((unsigned int *)&(rcvData[4])));
-	if( status != 0 )
-	{
-	    printf("bad status, %d, received\n", status );
-	    break;
-	}
+        status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
+        if( status )
+        {
+            break;
+        }
+        int type = (int)*((unsigned int *)&(rcvData[0]));
+        if( type != COMMS_DISPLAY_CAPTION )
+        {
+            printf("wrong type, %d, received\n", type );
+            break;
+        }
+        status = (int)ntohl(*((unsigned int *)&(rcvData[4])));
+        if( status != 0 )
+        {
+            printf("bad status, %d, received\n", status );
+            break;
+        }
     } while( 0 );
     return(0);
 }
@@ -278,32 +278,32 @@ int getParameters(int *pNumItems, int *pItemMax)
      */
     do
     {
-	n = send(sockfd, data, sizeof(int), 0 );
-	int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
-	if( status )
-	{
-	    break;
-	}
+        n = send(sockfd, data, sizeof(int), 0 );
+        int status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_SND );
+        if( status )
+        {
+            break;
+        }
         n = recvfrom(sockfd, (void *)data, 4 * sizeof(int), 0, (struct sockaddr *)&servaddr, &serverlen);
-	status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
-	if( status )
-	{
-	    break;
-	}
-	int type = (int)*(unsigned int *)&(data[0]);
-	if( type != COMMS_DISPLAY_GET_PARAMS )
-	{
-	    printf("wrong type, %d, received\n", type );
-	    break;
-	}
-	status = (int)htonl(*(unsigned int *)&(data[1]));
-	if( status != 0 )
-	{
-	    printf("bad status, %d, received\n", status );
-	    break;
-	}
-	*pNumItems = (int)htonl(*(unsigned int *)&(data[2]));
-	*pItemMax = (int)htonl(*(unsigned int *)&(data[3]));
+        status = checkSndOrRcvStatus( n, COMMS_STAT_CHK_RCV );
+        if( status )
+        {
+            break;
+        }
+        int type = (int)*(unsigned int *)&(data[0]);
+        if( type != COMMS_DISPLAY_GET_PARAMS )
+        {
+            printf("wrong type, %d, received\n", type );
+            break;
+        }
+        status = (int)htonl(*(unsigned int *)&(data[1]));
+        if( status != 0 )
+        {
+            printf("bad status, %d, received\n", status );
+            break;
+        }
+        *pNumItems = (int)htonl(*(unsigned int *)&(data[2]));
+        *pItemMax = (int)htonl(*(unsigned int *)&(data[3]));
     } while( 0 );
     return(0);
 }

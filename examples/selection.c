@@ -18,7 +18,7 @@ static void selection(void)
 	/* initial data */
     _Bool conventional= 1;
     _Bool noDuplicates= 0;
-    loadData( 0, NULL, noDuplicates );
+    loadData( 0, NULL, conventional );
 	update(data, numItems);
 	for(int ondx = 0 ; ondx < numItems ; ++ondx )
 	{

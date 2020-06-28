@@ -42,11 +42,11 @@ static void usage( void )
     struct sxnStruct *pStruct= &__start_algsxn;
     while( pStruct != &__stop_algsxn )
     {
-	if( pStruct->name != NULL )
-	{
-	    printf( "    %s\n", pStruct->name );
-	}
-	pStruct++;
+        if( pStruct->name != NULL )
+        {
+            printf( "    %s\n", pStruct->name );
+        }
+        pStruct++;
     }
     exit(1);
 }
@@ -69,17 +69,17 @@ static int menu( void )
      */
     do
     {
-	if( !strcmp(inStr,"1\n") )
-	{
-	    retVal = 1;
-	    break;
-	}
-	if( !strcmp(inStr,"2\n") )
-	{
-	    retVal = 2;
-	    update(data, numItems);
-	    break;
-	}
+        if( !strcmp(inStr,"1\n") )
+        {
+            retVal = 1;
+            break;
+        }
+        if( !strcmp(inStr,"2\n") )
+        {
+            retVal = 2;
+            update(data, numItems);
+            break;
+        }
     } while( 0 );
     return retVal;
 }
@@ -99,32 +99,32 @@ static struct sxnStruct *parseCmdLine( int argc, char *argv[] )
     int option= 0;
     while( (option = getopt( argc, argv, "a:" )) != -1 )
     {
-	switch( option )
-	{
+        switch( option )
+        {
         case 'a':
 
             algorithm = optarg;
             break;
-	}
+        }
     }
     if( algorithm == NULL )
     {
- 	usage();
+        usage();
     }
     struct sxnStruct *pStruct= &__start_algsxn;
     while( pStruct != &__stop_algsxn )
     {
-	if( !strcmp( pStruct->name, algorithm ) )
-	{
-	    printf( "found algoritm %s\n", algorithm );
-	    break;
-	}
-	pStruct++;
+        if( !strcmp( pStruct->name, algorithm ) )
+        {
+            printf( "found algorithm %s\n", algorithm );
+            break;
+        }
+        pStruct++;
     }
     if( pStruct == &__stop_algsxn )
     {
-	printf( "could not find algoritm %s, quitting\n", algorithm );
-	usage();
+        printf( "could not find algorithm %s, quitting\n", algorithm );
+        usage();
     }
     return pStruct;
 }
@@ -151,22 +151,22 @@ void main(int argc, char *argv[])
     numItems = ntohl(numItems);
     itemMax = ntohl(itemMax);
     printf("main(): getParameters() returned numItems= %d, itemMax= %d\n",
-	   numItems, itemMax);
+           numItems, itemMax);
     printf( "main() starting algorithm %s\n", pStruct->name );
     pStruct->algFxn();
     while(1)
     {
-	int retVal= menu();
-	if(retVal == 1)
-	{
-	    pStruct->algFxn();
-	    continue;
-	}
-	if(retVal == 2)
-	{
-	    continue;
-	}
-	break;
+        int retVal= menu();
+        if(retVal == 1)
+        {
+            pStruct->algFxn();
+            continue;
+        }
+        if(retVal == 2)
+        {
+            continue;
+        }
+        break;
     }
     terminateServer();
     joinThread();
